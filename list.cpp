@@ -26,11 +26,12 @@ void loadWords(string body, vector<string>& wordbook) {
     }
 }
 
-void complete(string& stub, vector<string>& wordbook, vector<string>& completions) {
+void complete(string& stub, vector<string>& wordbook, vector<string>& completions, int& tell) {
     for (string& word : wordbook) {
         if (word.starts_with(stub)) {
             completions.push_back(word);
         }
+        tell++;
     }
 }
 
@@ -50,12 +51,13 @@ int main(int argc, char* argv[]) {
         string word = getWord();
 
         vector<string> completions;
-        complete(word, wordbook, completions);
+        int tell = 0;
+        complete(word, wordbook, completions, tell);
         
         if (completions.empty()) {
             cout << "No suggestions found" << std::endl;
         } else {
-            cout << completions.size() << " matches" << std::endl;
+            cout << completions.size() << " matches in " << tell << " operations" << std::endl;
             int n = std::min(9, (int)completions.size());
             cout << "Top " << n << " suggestions:\n";
             for (int i = 0; i < n; i++) {

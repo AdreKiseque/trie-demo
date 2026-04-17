@@ -38,13 +38,15 @@ struct TrieNode {
         n += sizeof(TrieNode);
     }
 
-    void build(string stub, vector<string>& words) {
+    void build(string stub, vector<string>& words, int& tell) {
         for (TrieNode& child : children) {
             if (child.part == '\0') {
                 words.push_back(stub);
+                continue;
             }
-            child.build(stub + child.part, words);
+            child.build(stub + child.part, words, tell);
         }
+        tell++;
         return;
     }
 
@@ -120,13 +122,13 @@ public:
         return here;
     }
 
-    vector<string> complete(string stub) {
+    vector<string> complete(string stub, int& tell) {
         vector<string> words;
         TrieNode* ord = seek(stub);
         if (ord == nullptr) {
             return words;
         }
-        ord->build(stub, words);
+        ord->build(stub, words, tell);
         // Sort by length
         std::ranges::sort(words, {}, &std::string::size);
         return words;
@@ -160,11 +162,12 @@ int main(int argc, char* argv[]) {
         cout << "Enter (part of) a word: " << std::flush;
         string word = getWord();
 
-        vector<string> completions = myTrie.complete(word);
+        int tell = 0;
+        vector<string> completions = myTrie.complete(word, tell);
         if (completions.empty()) {
             cout << "No suggestions found" << std::endl;
         } else {
-            cout << completions.size() << " matches" << std::endl;
+            cout << completions.size() << " matches in " << tell << " operations" << std::endl;
             int n = std::min(9, (int)completions.size());
             cout << "Top " << n << " suggestions:\n";
             for (int i = 0; i < n; i++) {
